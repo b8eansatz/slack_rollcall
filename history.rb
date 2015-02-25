@@ -11,7 +11,7 @@ end
 
 def channels_history(params)
   params[:channel] = ENV['CHANNEL_ID']
-  params[:oldest] = Time.local(Time.now.year, Time.now.month, Time.now.day, 0, 0, 0).to_i
+  params[:oldest] = Time.local(Time.now.year, Time.now.month, Time.now.day, 9, 0, 0).to_i
   path = "/api/channels.history"
   geturi(path, params)
 end
@@ -38,39 +38,52 @@ def users_info(params)
   geturi(path, params)
 end
 
+def countdown
+  rollcall_time = Time.local(Time.now.year, Time.now.month, Time.now.day, 10, 30, 0).to_i
+  time_left = rollcall_time - Time.now.to_i + 24 * 3600 
+  sleep time_left
+end
+
 Dotenv.load
 token = ENV['TOKEN']
 params = {
   :token => token,
 }
 
-#GETS INFORMATION ABOUT A CHANNEL
-result_channel = JSON.parse(channels_info(params))
+countdown
 
-#FETCHES HISTORY OF MESSAGES & EVENTS FROM A CHARACTER
-result_history = JSON.parse(channels_history(params))
+loop {
+  unless ime.now.wday == 0 && Time.now.wday == 6 then
+    #GETS INFORMATION ABOUT A CHANNEL
+    result_channel = JSON.parse(channels_info(params))
 
-#GETS USERS EVER POSTED ON THE CHANNEL
-messages = result_history["messages"]
-attend = Array.new
-messages.each_with_index do |message, i|
-  puts message["user"]
-  attend << "#{message["user"]}"
-end
-attend = attend.uniq
+    #FETCHES HISTORY OF MESSAGES & EVENTS FROM A CHARACTER
+    result_history = JSON.parse(channels_history(params))
 
-#GETS USERS NEVER POSTED ON THE CHANNEL
-members = result_channel["channel"]["members"]
-absent = members - attend
+    #GETS USERS EVER POSTED ON THE CHANNEL
+    messages = result_history["messages"]
+    attend = Array.new
+    messages.each_with_index do |message, i|
+      puts message["user"]
+      attend << "#{message["user"]}"
+    end
+    attend = attend.uniq
 
-#SENDS MESSAGES TO EACH USERS
-attend.each_with_index do |user|
-  unless user.empty? == true then
-    params[:text] = "<@#{user}>: Good morning!"
-    chat_postMessage(params)
+    #GETS USERS NEVER POSTED ON THE CHANNEL
+    members = result_channel["channel"]["members"]
+    absent = members - attend
+
+    #SENDS MESSAGES TO EACH USERS
+    attend.each_with_index do |user|
+      unless user.empty? == true then
+        params[:text] = "<@#{user}>: Good morning!"
+        chat_postMessage(params)
+      end
+    end
+    absent.each_with_index do |user|
+      params[:text] = "<@#{user}>: How's it going?"
+      chat_postMessage(params)
+    end
   end
-end
-absent.each_with_index do |user|
-  params[:text] = "<@#{user}>: How's it going?"
-  chat_postMessage(params)
-end
+  countdown
+}
