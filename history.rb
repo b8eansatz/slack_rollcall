@@ -55,10 +55,17 @@ params = {
   :token => token,
 }
 
+wdays =["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
 countdown
 
 loop {
   unless Time.now.wday == 0 && Time.now.wday == 6 then
+
+    #POSTS TODAY'S DATE
+    params[:text] = "Today is #{wdays[Time.now.wday]}!"
+    chat_postMessage(params)
+
     #GETS INFORMATION ABOUT A CHANNEL
     result_channel = JSON.parse(channels_info(params))
 
