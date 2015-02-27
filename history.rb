@@ -11,7 +11,7 @@ end
 
 def channels_history(params)
   params[:channel] = ENV['CHANNEL_ID']
-  params[:oldest] = Time.local(Time.now.year, Time.now.month, Time.now.day, 9, 0, 0).to_i
+  params[:oldest] = Time.local(Time.now.year, Time.now.month, Time.now.day, ENV['OLD_HOUR'], ENV['OLD_MIN'], ENV['OLD_SEC']).to_i
   path = "/api/channels.history"
   geturi(path, params)
 end
@@ -38,16 +38,16 @@ def users_info(params)
   geturi(path, params)
 end
 
-def countdown
-  now = Time.now
-  rollcall_time = Time.local(now.year, now.month, now.day, ENV['HOUR'], ENV['MIN'], ENV['SEC']).to_i
-  if rollcall_time < now.to_i then
-    time_left = rollcall_time - Time.now.to_i + 24 * 3600 
-  else
-    time_left = rollcall_time - Time.now.to_i
-  end
-  sleep time_left
-end
+#def countdown
+#  now = Time.now
+#  rollcall_time = Time.local(now.year, now.month, now.day, ENV['HOUR'], ENV['MIN'], ENV['SEC']).to_i
+#  if rollcall_time < now.to_i then
+#    time_left = rollcall_time - Time.now.to_i + 24 * 3600 
+#  else
+#    time_left = rollcall_time - Time.now.to_i
+#  end
+#  sleep time_left
+#end
 
 Dotenv.load
 token = ENV['TOKEN']
@@ -57,14 +57,14 @@ params = {
 
 wdays =["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-countdown
+#countdown
 
-loop {
-  unless Time.now.wday == 0 && Time.now.wday == 6 then
+#loop {
+#  unless Time.now.wday == 0 && Time.now.wday == 6 then
 
-    #POSTS TODAY'S DATE
-    params[:text] = "Today is #{wdays[Time.now.wday]}!"
-    chat_postMessage(params)
+#    #POSTS TODAY'S DATE
+#    params[:text] = "Today is #{wdays[Time.now.wday]}!"
+#    chat_postMessage(params)
 
     #GETS INFORMATION ABOUT A CHANNEL
     result_channel = JSON.parse(channels_info(params))
@@ -96,6 +96,6 @@ loop {
       params[:text] = "<@#{user}>: How's it going?"
       chat_postMessage(params)
     end
-  end
-  countdown
-}
+#  end
+#  countdown
+#}
