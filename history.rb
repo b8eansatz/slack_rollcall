@@ -39,8 +39,13 @@ def users_info(params)
 end
 
 def countdown
-  rollcall_time = Time.local(Time.now.year, Time.now.month, Time.now.day, 10, 30, 0).to_i
-  time_left = rollcall_time - Time.now.to_i + 24 * 3600 
+  now = Time.now
+  rollcall_time = Time.local(now.year, now.month, now.day, ENV['HOUR'], ENV['MIN'], ENV['SEC']).to_i
+  if rollcall_time < now then
+    time_left = rollcall_time - Time.now.to_i + 24 * 3600 
+  else
+    time_left = rollcall_time - Time.now.to_i
+  end
   sleep time_left
 end
 
