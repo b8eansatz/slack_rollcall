@@ -41,7 +41,7 @@ end
 def countdown
   now = Time.now
   rollcall_time = Time.local(now.year, now.month, now.day, ENV['HOUR'], ENV['MIN'], ENV['SEC']).to_i
-  if rollcall_time < now then
+  if rollcall_time < now.to_i then
     time_left = rollcall_time - Time.now.to_i + 24 * 3600 
   else
     time_left = rollcall_time - Time.now.to_i
