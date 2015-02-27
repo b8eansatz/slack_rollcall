@@ -58,7 +58,7 @@ params = {
 countdown
 
 loop {
-  unless ime.now.wday == 0 && Time.now.wday == 6 then
+  unless Time.now.wday == 0 && Time.now.wday == 6 then
     #GETS INFORMATION ABOUT A CHANNEL
     result_channel = JSON.parse(channels_info(params))
 
