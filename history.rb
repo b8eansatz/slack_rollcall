@@ -69,7 +69,7 @@ loop {
     messages = result_history["messages"]
     attend = Array.new
     messages.each_with_index do |message, i|
-      puts message["user"]
+      #puts message["user"]
       attend << "#{message["user"]}"
     end
     attend = attend.uniq
