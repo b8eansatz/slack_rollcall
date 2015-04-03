@@ -25,6 +25,7 @@ end
 
 def chat_postMessage(params)
   params[:username] = ENV['USERNAME']
+  params[:icon_url] = ENV['ICON_URL']
   path = "/api/chat.postMessage"
   geturi(path, params)
 end
