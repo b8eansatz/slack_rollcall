@@ -2,6 +2,7 @@ require 'uri'
 require 'net/http'
 require 'json'
 require 'dotenv'
+require 'holiday_jp'
 
 def geturi(path, params)
   uri = URI::HTTPS.build(:host => "slack.com", :path => "#{path}")
@@ -44,32 +45,41 @@ params = {
   :token => token,
 }
 
-#GETS INFORMATION ABOUT A CHANNEL
-result_channel = JSON.parse(channels_info(params))
+#GETS TODAY'S DATE
+date = Time.now
+if date.wday != 0 && date.wday != 6
+  today = Date.civil(date.year, date.month, date.day)
+  holiday = HolidayJp.between(today, today)
+  if holiday.empty? == true 
 
-#FETCHES HISTORY OF MESSAGES & EVENTS FROM A CHARACTER
-result_history = JSON.parse(channels_history(params))
+    #GETS INFORMATION ABOUT A CHANNEL
+    result_channel = JSON.parse(channels_info(params))
 
-#GETS USERS EVER POSTED ON THE CHANNEL
-messages = result_history["messages"]
-attend = Array.new
-messages.each_with_index do |message, i|
-  attend << "#{message["user"]}"
-end
-attend = attend.uniq
+    #FETCHES HISTORY OF MESSAGES & EVENTS FROM A CHARACTER
+    result_history = JSON.parse(channels_history(params))
 
-#GETS USERS NEVER POSTED ON THE CHANNEL
-members = result_channel["channel"]["members"]
-absent = members - attend
+    #GETS USERS EVER POSTED ON THE CHANNEL
+    messages = result_history["messages"]
+    attend = Array.new
+    messages.each_with_index do |message, i|
+      attend << "#{message["user"]}"
+    end
+    attend = attend.uniq
 
-#SENDS MESSAGES TO EACH USERS
-#attend.each_with_index do |user|
-#  unless user.empty? == true then
-#    params[:text] = "<@#{user}>: Good morning!"
-#    chat_postMessage(params)
-#  end
-#end
-absent.each_with_index do |user|
-  params[:text] = "<@#{user}>: 今日のタスクは何ですかー？"
-  chat_postMessage(params)
+    #GETS USERS NEVER POSTED ON THE CHANNEL
+    members = result_channel["channel"]["members"]
+    absent = members - attend
+
+    #SENDS MESSAGES TO EACH USERS
+#    attend.each_with_index do |user|
+#      unless user.empty? == true then
+#        params[:text] = "<@#{user}>: Good morning!"
+#        chat_postMessage(params)
+#      end
+#    end
+    absent.each_with_index do |user|
+      params[:text] = "<@#{user}>: 今日のタスクは何ですかー？"
+      chat_postMessage(params)
+    end
+  end
 end
