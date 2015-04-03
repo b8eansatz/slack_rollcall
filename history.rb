@@ -63,13 +63,13 @@ members = result_channel["channel"]["members"]
 absent = members - attend
 
 #SENDS MESSAGES TO EACH USERS
-attend.each_with_index do |user|
-  unless user.empty? == true then
-    params[:text] = "<@#{user}>: Good morning!"
-    chat_postMessage(params)
-  end
-end
+#attend.each_with_index do |user|
+#  unless user.empty? == true then
+#    params[:text] = "<@#{user}>: Good morning!"
+#    chat_postMessage(params)
+#  end
+#end
 absent.each_with_index do |user|
-  params[:text] = "<@#{user}>: How's it going?"
+  params[:text] = "<@#{user}>: 今日のタスクは何ですかー？"
   chat_postMessage(params)
 end
